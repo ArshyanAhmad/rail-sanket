@@ -12,7 +12,11 @@ export function LandingFooter() {
 
   const handleDashboardClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    router.push('/auth')
+    if (isAuthenticated) {
+      router.push('/dashboard')
+    } else {
+      router.push('/auth')
+    }
   }
 
   return (

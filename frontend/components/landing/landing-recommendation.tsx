@@ -19,7 +19,11 @@ export function LandingRecommendation() {
   const { isAuthenticated } = useAuth()
 
   const handleDashboardClick = () => {
-    router.push('/auth')
+    if (isAuthenticated) {
+      router.push('/dashboard')
+    } else {
+      router.push('/auth')
+    }
   }
 
   return (

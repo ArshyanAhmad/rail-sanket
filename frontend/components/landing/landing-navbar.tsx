@@ -32,7 +32,11 @@ export function LandingNavbar() {
   const handleDashboardClick = (e: React.MouseEvent) => {
     e.preventDefault()
     setMobileMenuOpen(false)
-    router.push('/auth')
+    if (isAuthenticated) {
+      router.push('/dashboard')
+    } else {
+      router.push('/auth')
+    }
   }
 
   const navLinks = [

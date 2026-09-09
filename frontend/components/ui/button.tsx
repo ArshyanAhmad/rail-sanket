@@ -58,6 +58,7 @@ function Button({
     return (
       <ButtonPrimitive
         data-slot="button"
+        nativeButton={false}
         render={children as React.ReactElement}
         className={cn(buttonVariants({ variant, size, className }))}
         {...props}
