@@ -14,6 +14,7 @@ import {
   ArrowLeftRight,
   LogOut,
   Shield,
+  Home,
 } from 'lucide-react'
 import { activeNav } from '@/lib/nav'
 import { Button } from '@/components/ui/button'
@@ -88,6 +89,19 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
 
       {/* Right Controls */}
       <div className="ml-auto flex items-center gap-2">
+        {/* Go to Public Home Page Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          asChild
+          className="h-8 gap-1.5 rounded-lg border-border text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-muted"
+        >
+          <Link href="/" title="Return to Public Home Page">
+            <Home className="size-3.5 text-primary" />
+            <span className="hidden sm:inline">Public Home</span>
+          </Link>
+        </Button>
+
         {/* Division Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger className="hidden h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 text-xs font-medium text-foreground hover:bg-muted lg:flex outline-none cursor-pointer">
@@ -233,64 +247,29 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
               </div>
             </div>
 
-            {/* Quick Switch Officer Cadres */}
-            <div className="px-1 py-1">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-1.5 flex items-center justify-between">
-                <span>Switch Officer Cadre</span>
-                <span className="text-[9px] text-primary font-semibold">1-Click Switch</span>
-              </div>
-              <div className="space-y-1">
-                {defaultOfficers.map((officer) => {
-                  const isActive = user?.cadre === officer.cadre
-                  return (
-                    <button
-                      key={officer.id}
-                      type="button"
-                      onClick={() => {
-                        login(officer, pathname)
-                        toast.success(`Switched active session to ${officer.name} (${officer.cadre})`)
-                      }}
-                      className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-xs transition-all text-left cursor-pointer ${
-                        isActive
-                          ? 'bg-blue-50/80 text-primary font-bold border border-blue-200'
-                          : 'hover:bg-slate-100 text-slate-700 border border-transparent'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`inline-flex items-center justify-center size-5 rounded text-[10px] font-bold shrink-0 ${
-                          isActive ? 'bg-primary text-white' : 'bg-slate-200 text-slate-700'
-                        }`}>
-                          {officer.initials}
-                        </span>
-                        <div className="min-w-0">
-                          <div className="text-xs font-semibold truncate leading-tight">{officer.name}</div>
-                          <div className="text-[10px] text-slate-500 truncate leading-tight">{officer.department.split(' ')[0]}</div>
-                        </div>
-                      </div>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
-                        isActive ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'
-                      }`}>
-                        {officer.cadre}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+            {/* Profile Menu Actions */}
+            <div className="p-1 space-y-0.5">
+              <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer w-full"
+                >
+                  <Home className="size-3.5 text-primary" />
+                  <span>Return to Public Home</span>
+                </Link>
+              </DropdownMenuItem>
 
-            <DropdownMenuSeparator className="my-1.5 bg-slate-100" />
-
-            {/* Bottom Actions */}
-            <div className="space-y-0.5">
               <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
                 <Link
                   href="/auth"
                   className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer w-full"
                 >
                   <ArrowLeftRight className="size-3.5 text-slate-500" />
-                  <span>Go to Login &amp; Officer Hub</span>
+                  <span>Switch Officer (Login Section)</span>
                 </Link>
               </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="my-1 bg-slate-100" />
 
               <DropdownMenuItem
                 onClick={logout}

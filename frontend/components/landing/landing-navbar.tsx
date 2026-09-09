@@ -58,7 +58,7 @@ export function LandingNavbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* LEFT: Branding */}
-          <Link href="#home" className="flex items-center gap-3 group focus:outline-none">
+          <Link href="/" className="flex items-center gap-3 group focus:outline-none cursor-pointer">
             <div className="relative h-9 w-40 sm:w-48 shrink-0">
               <Image
                 src="/images/rail-sanket-logo.png"

@@ -14,6 +14,8 @@ import {
   LogOut,
   CheckCircle2,
   Building2,
+  ArrowLeft,
+  Home,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -175,9 +177,20 @@ function AuthForm() {
 
   return (
     <div className="w-full max-w-md rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-sm">
+      {/* Back to Home Link */}
+      <div className="mb-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors group"
+        >
+          <ArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back to Public Home</span>
+        </Link>
+      </div>
+
       {/* Mobile Branding Header */}
       <div className="mb-6 lg:hidden">
-        <div className="relative h-10 w-44 mb-1.5">
+        <Link href="/" title="Go to Public Home" className="block relative h-10 w-44 mb-1.5 hover:opacity-90 transition-opacity">
           <Image
             src="/images/rail-sanket-logo.png"
             alt="Rail Sanket"
@@ -185,7 +198,7 @@ function AuthForm() {
             className="object-contain object-left"
             priority
           />
-        </div>
+        </Link>
         <p className="text-xs text-slate-500 font-medium">
           Automatic Block Planning &amp; Maintenance Bundling
         </p>
@@ -326,9 +339,9 @@ export default function AuthPage() {
         {/* Left Side: Branding & Indian Railways Identity */}
         <div className="hidden lg:flex flex-col justify-between border-r border-slate-200/90 bg-[#f8fafc] p-8">
           <div>
-            {/* Logo with increased size and clean presentation */}
+            {/* Logo with link to public home page */}
             <div className="mb-5 flex items-center">
-              <div className="relative h-12 w-56">
+              <Link href="/" title="Go to Public Home" className="block relative h-12 w-56 hover:opacity-90 transition-opacity">
                 <Image
                   src="/images/rail-sanket-logo.png"
                   alt="Rail Sanket"
@@ -336,7 +349,7 @@ export default function AuthPage() {
                   className="object-contain object-left"
                   priority
                 />
-              </div>
+              </Link>
             </div>
 
             <div className="mb-5">
@@ -352,22 +365,22 @@ export default function AuthPage() {
               </p>
             </div>
 
-            {/* Locomotive Image Frame */}
+            {/* Railway Track Corridor Image Frame */}
             <div className="relative h-44 w-full rounded-xl overflow-hidden border border-slate-200 shadow-xs mb-5">
               <Image
-                src="/images/train-photo.jpg"
-                alt="Indian Railways Locomotive"
+                src="/images/railway-track-hero.jpg"
+                alt="Indian Railways Corridor Track Infrastructure"
                 fill
                 className="object-cover object-center"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
               <div className="absolute bottom-3 left-3.5 right-3.5 text-white">
                 <p className="text-xs font-semibold drop-shadow-sm">
                   South Eastern Railway · Kharagpur Division
                 </p>
                 <p className="text-[10px] text-slate-200 drop-shadow-sm">
-                  Corridor Maintenance &amp; Traffic Block Coordination
+                  Corridor Track Infrastructure &amp; Traffic Block Coordination
                 </p>
               </div>
             </div>

@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   AlertTriangle,
   AlertCircle,
+  Home,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -53,7 +54,11 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="relative h-10 w-48 shrink-0">
+              <Link
+                href="/"
+                title="Click logo to go to Public Home Page"
+                className="relative h-10 w-48 shrink-0 hover:opacity-90 transition-opacity cursor-pointer block"
+              >
                 <Image
                   src="/images/rail-sanket-logo.png"
                   alt="Rail Sanket"
@@ -61,7 +66,7 @@ export default function DashboardPage() {
                   className="object-contain object-left"
                   priority
                 />
-              </div>
+              </Link>
               <div className="h-6 w-px bg-slate-200" />
               <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
                 Operations &amp; Block Planning
@@ -88,6 +93,12 @@ export default function DashboardPage() {
               <Button size="sm" variant="ghost" asChild>
                 <Link href="/queue">
                   Maintenance Queue (85)
+                </Link>
+              </Button>
+              <Button size="sm" variant="outline" asChild className="gap-1.5 border-slate-200 text-slate-600 hover:text-slate-900">
+                <Link href="/" title="Return to Public Home Page">
+                  <Home className="size-3.5 text-primary" />
+                  <span>Public Home</span>
                 </Link>
               </Button>
             </div>

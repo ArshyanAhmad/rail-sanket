@@ -7,6 +7,7 @@ import {
   TrainFront,
   ChevronsLeft,
   LogOut,
+  Home,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { navItems, navSections } from '@/lib/nav'
@@ -41,11 +42,19 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
           )}
         >
           {collapsed ? (
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
+            <Link
+              href="/"
+              title="Click to go to Public Home Page"
+              className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
+            >
               <TrainFront className="size-5" />
-            </div>
+            </Link>
           ) : (
-            <div className="flex flex-col justify-center min-w-0 py-0.5">
+            <Link
+              href="/"
+              title="Click logo to go to Public Home Page"
+              className="flex flex-col justify-center min-w-0 py-0.5 hover:opacity-90 transition-opacity cursor-pointer group"
+            >
               <div className="relative h-9 w-44 shrink-0">
                 <Image
                   src="/images/rail-sanket-logo.png"
@@ -55,10 +64,11 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
                   priority
                 />
               </div>
-              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider truncate mt-0.5">
-                Kharagpur Division · SER
+              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider truncate mt-0.5 group-hover:text-primary transition-colors flex items-center gap-1">
+                <span>Kharagpur Division · SER</span>
+                <span className="text-[9px] text-primary font-bold">← Home</span>
               </span>
-            </div>
+            </Link>
           )}
         </div>
 
@@ -141,6 +151,22 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
             )
           })}
         </nav>
+
+        {/* Public Home Page Button */}
+        <div className="px-3 pb-2 pt-1">
+          <Link
+            href="/"
+            onClick={onNavigate}
+            title="Return to Public Home Page"
+            className={cn(
+              'flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-primary hover:border-blue-200 transition-all shadow-2xs group',
+              collapsed && 'justify-center px-0 size-9 mx-auto'
+            )}
+          >
+            <Home className="size-4 text-primary shrink-0 group-hover:scale-110 transition-transform" />
+            {!collapsed && <span>Public Home Page</span>}
+          </Link>
+        </div>
 
         {/* Bottom Officer info & Logout */}
         <div className="border-t border-sidebar-border p-3 bg-slate-50/50">
