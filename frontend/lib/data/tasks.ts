@@ -49,10 +49,13 @@ function computePriority(t: RawTask): {
   const density = corridorMap[t.corridorId]?.trafficDensity ?? 'Medium'
   const densityScore = density === 'High' ? 100 : density === 'Medium' ? 65 : 35
 
-  const critical = criticalityScore[t.criticality]
-  const urgency = Math.max(0, Math.min(100, 100 - t.overdueDays * -4)) // overdue increases urgency
-  const overdue = Math.min(100, t.overdueDays * 6)
-  const safety = t.defectSeverity
+  const safeCrit = (['Low', 'Medium', 'High', 'Critical'].includes(t.criticality)
+    ? t.criticality
+    : 'Medium') as Criticality
+  const critical = criticalityScore[safeCrit] ?? 55
+  const urgency = Math.max(0, Math.min(100, 100 - (t.overdueDays || 0) * -4))
+  const overdue = Math.min(100, (t.overdueDays || 0) * 6)
+  const safety = t.defectSeverity || 50
   const assetImpact = densityScore
   const operational = t.dependencies && t.dependencies.length ? 40 : 70
 
@@ -64,7 +67,7 @@ function computePriority(t: RawTask): {
     0.1 * overdue +
     0.05 * operational
 
-  const priority = Math.round(Math.max(0, Math.min(100, raw)))
+  const priority = isNaN(raw) ? 50 : Math.round(Math.max(0, Math.min(100, raw)))
 
   const factors: PriorityFactor[] = [
     {
@@ -149,7 +152,7 @@ const rawTasks: RawTask[] = [
   { id: 'ENG-268', department: 'Engineering', assetId: 'TRK-2130', assetType: 'Track', corridorId: 'C03', location: 'KGP–GII, KM 30', taskType: 'Track alignment', criticality: 'Medium', defectSeverity: 39, overdueDays: 0, estimatedDuration: 120, requiredBlockType: 'Traffic Block', crew: 'PWay Gang 5', dueDate: '2026-09-17', status: 'Scheduled' },
   { id: 'TD-166', department: 'Traction', assetId: 'TSS-08', assetType: 'Traction Substation', corridorId: 'C01', location: 'KGP TSS Bay 4', taskType: 'Relay testing', criticality: 'Medium', defectSeverity: 45, overdueDays: 2, estimatedDuration: 90, requiredBlockType: 'Power Block', crew: 'TRD Team 1', dueDate: '2026-09-10', status: 'Scheduled' },
   { id: 'SNT-201', department: 'S&T', assetId: 'SIG-2280', assetType: 'Signal', corridorId: 'C02', location: 'BLS Home Signal', taskType: 'Signal maintenance', criticality: 'Medium', defectSeverity: 48, overdueDays: 0, estimatedDuration: 45, requiredBlockType: 'Signalling Disconnection', crew: 'S&T Gang A', dueDate: '2026-09-16', status: 'Scheduled' },
-  { id: 'ENG-277', department: 'Engineering', assetId: 'TRK-1250', assetType: 'Track', corridorId: 'C02', location: 'BLS–CTC, KM 220', taskType: 'Rail fracture repair', criticality: 'Completed' as unknown as Criticality, defectSeverity: 55, overdueDays: 0, estimatedDuration: 60, requiredBlockType: 'Traffic Block', crew: 'PWay Gang 7', dueDate: '2026-09-01', status: 'Completed' },
+  { id: 'ENG-277', department: 'Engineering', assetId: 'TRK-1250', assetType: 'Track', corridorId: 'C02', location: 'BLS–CTC, KM 220', taskType: 'Rail fracture repair', criticality: 'Critical', defectSeverity: 55, overdueDays: 0, estimatedDuration: 60, requiredBlockType: 'Traffic Block', crew: 'PWay Gang 7', dueDate: '2026-09-01', status: 'Completed' },
   { id: 'TD-174', department: 'Traction', assetId: 'OHE-8890', assetType: 'OHE', corridorId: 'C01', location: 'SRC–PKU, KM 60', taskType: 'OHE inspection', criticality: 'Low', defectSeverity: 21, overdueDays: 0, estimatedDuration: 60, requiredBlockType: 'Power Block', crew: 'TRD Team 1', dueDate: '2026-09-02', status: 'Completed' },
 
   { id: 'SNT-214', department: 'S&T', assetId: 'TC-5580', assetType: 'Track Circuit', corridorId: 'C04', location: 'BBS–KUR, TC-260', taskType: 'Track circuit failure', criticality: 'High', defectSeverity: 69, overdueDays: 5, estimatedDuration: 75, requiredBlockType: 'Signalling Disconnection', crew: 'S&T Gang D', dueDate: '2026-09-05', status: 'Open' },

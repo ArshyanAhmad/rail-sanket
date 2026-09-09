@@ -17,6 +17,7 @@ import {
   Home,
 } from 'lucide-react'
 import { activeNav } from '@/lib/nav'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -47,238 +48,142 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
   const pathname = usePathname()
   const current = activeNav(pathname)
   const { user, login, logout } = useAuth()
-  const [selectedDiv, setSelectedDiv] = useState(divisions[0])
-  const [notifications, setNotifications] = useState(notificationsList)
 
-  const unreadCount = notifications.filter((n) => n.unread).length
-
-  function markAllRead() {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })))
-    toast.success('All notifications marked as read')
+  const handleSwitchOfficer = (officer: typeof defaultOfficers[0]) => {
+    login(officer, pathname)
+    toast.success(`Switched to Officer ${officer.name}`, {
+      description: `${officer.cadre} · ${officer.department}`,
+    })
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-white px-4 md:px-6 select-none">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="lg:hidden"
-        onClick={onMenu}
-        aria-label="Open navigation"
-      >
-        <Menu className="size-5" />
-      </Button>
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-white px-4 md:px-6 select-none">
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
+          onClick={onMenu}
+          aria-label="Open navigation"
+        >
+          <Menu className="size-5" />
+        </Button>
 
-      {/* Page Title & Breadcrumb */}
-      <div className="min-w-0 flex items-center gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="truncate text-sm font-semibold text-foreground">
-              {current?.label ?? 'Dashboard'}
+        {/* Page Title & Division */}
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5">
+            <h1 className="truncate text-sm font-bold text-slate-900">
+              {current?.label ?? 'Operations & Block Planning'}
             </h1>
-            <span className="hidden rounded border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-medium text-primary sm:inline-flex items-center gap-1">
-              <Calendar className="size-2.5" />
-              Week 38 · Sep 2026
+            <span className="hidden sm:inline-flex items-center gap-1 rounded border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-primary">
+              <Building2 className="size-3 text-primary" />
+              Kharagpur Division
             </span>
           </div>
-          <p className="hidden truncate text-xs text-muted-foreground sm:block">
-            {selectedDiv.zone} · {selectedDiv.name}
+          <p className="hidden text-xs text-muted-foreground sm:block">
+            South Eastern Railway · AI Automatic Block Planning
           </p>
         </div>
       </div>
 
-      {/* Right Controls */}
-      <div className="ml-auto flex items-center gap-2">
-        {/* Go to Public Home Page Button */}
-        <Button
-          variant="outline"
-          size="sm"
-          asChild
-          className="h-8 gap-1.5 rounded-lg border-border text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-muted"
-        >
-          <Link href="/" title="Return to Public Home Page">
-            <Home className="size-3.5 text-primary" />
-            <span className="hidden sm:inline">Public Home</span>
-          </Link>
-        </Button>
+      {/* Right Controls: Officer Info & Profile Dropdown */}
+      <div className="flex items-center gap-3">
+        {/* Officer Name & Department Display */}
+        <div className="hidden md:flex flex-col text-right leading-tight">
+          <span className="text-xs font-bold text-slate-900">
+            {user?.name || 'S. K. Mukherjee'}
+          </span>
+          <span className="text-[11px] font-medium text-slate-500">
+            {user?.department || 'Operating Control'}
+          </span>
+        </div>
 
-        {/* Division Selector */}
+        {/* Profile Dropdown */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="hidden h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 text-xs font-medium text-foreground hover:bg-muted lg:flex outline-none cursor-pointer">
-            <Building2 className="size-3.5 text-primary" />
-            <span>{selectedDiv.name}</span>
-            <ChevronDown className="size-3 text-muted-foreground" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
-            <DropdownMenuLabel className="text-xs">Select Railway Division</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {divisions.map((div) => (
-              <DropdownMenuItem
-                key={div.id}
-                onClick={() => {
-                  setSelectedDiv(div)
-                  toast.info(`Switched to ${div.name}`)
-                }}
-                className="flex items-center justify-between py-2 text-xs cursor-pointer"
-              >
-                <div>
-                  <div className="font-semibold text-foreground">{div.name}</div>
-                  <div className="text-[10px] text-muted-foreground">{div.zone}</div>
-                </div>
-                {selectedDiv.id === div.id && (
-                  <CheckCircle2 className="size-4 text-primary" />
-                )}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Notifications */}
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="relative flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground outline-none cursor-pointer"
-            aria-label="Notifications"
-          >
-            <Bell className="size-4" />
-            {unreadCount > 0 && (
-              <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-danger ring-2 ring-white" />
-            )}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <div className="flex items-center justify-between px-3 py-2">
-              <span className="text-xs font-semibold text-foreground">
-                Notifications ({unreadCount} new)
-              </span>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllRead}
-                  className="text-[11px] font-medium text-primary hover:underline"
-                >
-                  Mark all read
-                </button>
-              )}
-            </div>
-            <DropdownMenuSeparator />
-            <div className="max-h-72 overflow-y-auto">
-              {notifications.map((n) => (
-                <DropdownMenuItem
-                  key={n.id}
-                  className="flex flex-col items-start gap-1 py-2.5 px-3 cursor-pointer"
-                  onClick={() => {
-                    setNotifications((prev) =>
-                      prev.map((item) => (item.id === n.id ? { ...item, unread: false } : item))
-                    )
-                  }}
-                >
-                  <div className="flex w-full items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">{n.title}</span>
-                    {n.unread && (
-                      <span className="size-1.5 rounded-full bg-danger" />
-                    )}
-                  </div>
-                  <span className="text-[11px] text-muted-foreground leading-snug">{n.meta}</span>
-                </DropdownMenuItem>
-              ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* User Profile */}
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2.5 px-2.5 py-1.5 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all outline-none cursor-pointer shadow-xs">
-            <div className="relative">
-              <Avatar className="size-7 ring-1 ring-primary/30 shrink-0">
-                <AvatarFallback className="bg-primary text-primary-foreground text-[11px] font-bold">
-                  {user?.initials || 'IR'}
-                </AvatarFallback>
-              </Avatar>
-              <span className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full bg-emerald-500 ring-2 ring-white" />
-            </div>
-            <div className="hidden text-left leading-tight sm:block">
-              <div className="text-xs font-bold text-slate-900">{user?.name || 'Officer On-Duty'}</div>
-              <div className="text-[10px] font-medium text-slate-500 flex items-center gap-1">
-                <span className="font-bold text-primary">{user?.cadre || 'IRTS'}</span>
-                <span>·</span>
-                <span className="truncate max-w-[110px]">{user?.department ? user.department.split(' ')[0] : 'Operating'}</span>
-              </div>
-            </div>
-            <ChevronDown className="size-3 text-slate-400 ml-0.5" />
+          <DropdownMenuTrigger className="flex items-center gap-2 px-2.5 py-1.5 h-9 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all outline-none cursor-pointer shadow-2xs">
+            <Avatar className="size-6 ring-1 ring-primary/30 shrink-0">
+              <AvatarFallback className="bg-primary text-primary-foreground text-[10px] font-bold">
+                {user?.initials || 'SM'}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-xs font-semibold text-slate-700 sm:inline hidden">
+              Profile
+            </span>
+            <ChevronDown className="size-3 text-slate-400" />
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className="w-80 p-2 rounded-2xl shadow-xl border border-slate-200/90 bg-white">
-            {/* Officer Header Card */}
-            <div className="rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-3.5 text-white shadow-xs mb-2">
-              <div className="flex items-start gap-3">
-                <Avatar className="size-11 ring-2 ring-white/20 shadow-sm shrink-0">
-                  <AvatarFallback className="bg-primary text-white text-sm font-bold">
-                    {user?.initials || 'IR'}
+          <DropdownMenuContent align="end" className="w-72 p-2 rounded-xl shadow-lg border border-slate-200 bg-white">
+            {/* Officer Details Card */}
+            <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 mb-2">
+              <div className="flex items-center gap-2.5">
+                <Avatar className="size-9 ring-1 ring-slate-300 shrink-0">
+                  <AvatarFallback className="bg-primary text-white text-xs font-bold">
+                    {user?.initials || 'SM'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="font-bold text-white text-sm truncate">
-                      {user?.name || 'Officer On-Duty'}
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300 border border-emerald-500/30 shrink-0">
-                      <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Active Duty
-                    </span>
+                  <div className="text-xs font-bold text-slate-900 truncate">
+                    {user?.name || 'S. K. Mukherjee'}
                   </div>
-                  <div className="text-[11px] text-slate-300 truncate mt-0.5">
-                    {user?.designation || 'Divisional Planning Officer'}
+                  <div className="text-[10px] text-slate-500 font-medium truncate">
+                    {user?.designation || 'Sr. Divisional Operations Manager'}
                   </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                    <span className="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold bg-primary text-white">
-                      {user?.cadre || 'IRTS'}
-                    </span>
-                    <span className="text-[10px] text-slate-300">
-                      {user?.department || 'Operating'}
-                    </span>
+                  <div className="text-[10px] text-primary font-semibold truncate mt-0.5">
+                    {user?.cadre || 'IRTS'} · {user?.department || 'Operating'}
                   </div>
                 </div>
               </div>
-
-              <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-300">
-                <span className="flex items-center gap-1 truncate">
-                  <Building2 className="size-3 text-slate-400 shrink-0" />
-                  <span className="truncate">{user?.division || 'Kharagpur Division, SER'}</span>
-                </span>
-                <span className="font-mono text-slate-400 shrink-0">CRIS Railnet</span>
-              </div>
             </div>
 
-            {/* Profile Menu Actions */}
-            <div className="p-1 space-y-0.5">
-              <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
-                <Link
-                  href="/"
-                  className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer w-full"
-                >
-                  <Home className="size-3.5 text-primary" />
-                  <span>Return to Public Home</span>
-                </Link>
-              </DropdownMenuItem>
+            {/* Switch Demo Officer Sub-list */}
+            <div className="px-1 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Switch Demo Officer
+            </div>
+            <div className="space-y-0.5">
+              {defaultOfficers.map((officer) => {
+                const isActive = user?.id === officer.id
+                return (
+                  <button
+                    key={officer.id}
+                    onClick={() => handleSwitchOfficer(officer)}
+                    className={cn(
+                      "w-full text-left px-2.5 py-1.5 rounded-md text-xs transition-colors flex items-center justify-between cursor-pointer",
+                      isActive
+                        ? "bg-primary/10 text-primary font-semibold"
+                        : "hover:bg-slate-100 text-slate-700"
+                    )}
+                  >
+                    <div>
+                      <div className="font-medium truncate">{officer.name}</div>
+                      <div className="text-[10px] text-slate-400 truncate">
+                        {officer.cadre} · {officer.department.split(' ')[0]}
+                      </div>
+                    </div>
+                    {isActive && <CheckCircle2 className="size-3.5 text-primary shrink-0" />}
+                  </button>
+                )
+              })}
+            </div>
 
-              <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
-                <Link
-                  href="/auth"
-                  className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer w-full"
-                >
-                  <ArrowLeftRight className="size-3.5 text-slate-500" />
-                  <span>Switch Officer (Login Section)</span>
-                </Link>
-              </DropdownMenuItem>
+            <DropdownMenuSeparator className="my-1.5" />
 
-              <DropdownMenuSeparator className="my-1 bg-slate-100" />
-
-              <DropdownMenuItem
-                onClick={logout}
-                className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer w-full"
+            <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+              <Link
+                href="/"
+                className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer w-full"
               >
-                <LogOut className="size-3.5 text-red-600" />
-                <span className="font-semibold">Sign Out</span>
-              </DropdownMenuItem>
-            </div>
+                <Home className="size-3.5 text-slate-500" />
+                <span>Return to Public Website</span>
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={logout}
+              className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer w-full"
+            >
+              <LogOut className="size-3.5 text-red-600" />
+              <span>Logout</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

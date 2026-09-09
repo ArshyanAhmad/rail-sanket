@@ -19,11 +19,7 @@ export function LandingHero() {
   const { isAuthenticated } = useAuth()
 
   const handleDashboardClick = () => {
-    if (isAuthenticated) {
-      router.push('/dashboard')
-    } else {
-      router.push('/auth?redirect=/dashboard')
-    }
+    router.push('/auth')
   }
 
   return (

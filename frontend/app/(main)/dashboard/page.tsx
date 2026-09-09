@@ -1,5 +1,9 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { toast } from 'sonner'
 import {
   ArrowRight,
   CalendarClock,
@@ -9,14 +13,28 @@ import {
   AlertTriangle,
   AlertCircle,
   Home,
+  Check,
+  Eye,
+  TrainTrack,
+  Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { AvailabilityChart } from '@/components/charts/availability-chart'
 import { tasks } from '@/lib/data/tasks'
 import { recommendedBlocks } from '@/lib/data/recommendations'
+import type { RecommendedBlock } from '@/lib/types'
 import { conflicts, exceptions } from '@/lib/data/conflicts'
 import { corridorName } from '@/lib/data/corridors'
+import { cn } from '@/lib/utils'
 
 // 6 focused KPI cards requested in Phase 5
 const dashboardKpis = [
@@ -29,12 +47,22 @@ const dashboardKpis = [
 ]
 
 export default function DashboardPage() {
+  const [approvedBlockIds, setApprovedBlockIds] = useState<Record<string, boolean>>({})
+  const [reviewModalBlock, setReviewModalBlock] = useState<RecommendedBlock | null>(null)
+
   const priorityTasks = tasks
     .filter((t) => t.status === 'Open' || t.status === 'Scheduled')
     .sort((a, b) => b.priority - a.priority)
     .slice(0, 6)
 
   const openConflicts = conflicts.filter((c) => !c.resolved)
+
+  const handleApproveBlock = (blockId: string, corridor: string, date: string) => {
+    setApprovedBlockIds((prev) => ({ ...prev, [blockId]: true }))
+    toast.success(`Block Approved: ${corridor}`, {
+      description: `Scheduled maintenance window confirmed for ${date}. Notice sent to Operating Control.`,
+    })
+  }
 
   return (
     <div className="space-y-6">
@@ -137,21 +165,21 @@ export default function DashboardPage() {
         ))}
       </section>
 
-      {/* SECTION 1: Weekly Maintenance Overview */}
+      {/* SECTION 1: Weekly Block Utilization */}
       <Card>
         <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
           <div>
-            <CardTitle className="text-base">Weekly Maintenance Overview</CardTitle>
+            <CardTitle className="text-base">Weekly Block Utilization</CardTitle>
             <p className="mt-1 text-xs text-muted-foreground">
-              Available Block Hours vs. Planned Block Hours across corridors (past 7 days)
+              Available Hours vs. Planned Hours across corridors (past 7 days)
             </p>
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5 font-medium">
-              <span className="size-2.5 rounded-full bg-chart-1" /> Available Block Hours
+              <span className="size-2.5 rounded-full bg-chart-1" /> Available Hours
             </span>
             <span className="flex items-center gap-1.5 font-medium">
-              <span className="size-2.5 rounded-full bg-chart-2" /> Planned Block Hours
+              <span className="size-2.5 rounded-full bg-chart-2" /> Planned Hours
             </span>
           </div>
         </CardHeader>
@@ -166,7 +194,7 @@ export default function DashboardPage() {
           <div>
             <CardTitle className="text-base">Recommended Blocks</CardTitle>
             <p className="mt-1 text-xs text-muted-foreground">
-              Optimized corridor block windows ready for planner review
+              Corridor windows ready for review and immediate approval
             </p>
           </div>
           <Button variant="outline" size="sm" asChild>
@@ -181,56 +209,93 @@ export default function DashboardPage() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-border text-[11px] font-semibold text-slate-700 uppercase tracking-wider">
                 <tr>
-                  <th className="px-3.5 py-2.5">Date</th>
                   <th className="px-3.5 py-2.5">Corridor</th>
+                  <th className="px-3.5 py-2.5">Date</th>
                   <th className="px-3.5 py-2.5">Time</th>
                   <th className="px-3.5 py-2.5">Duration</th>
                   <th className="px-3.5 py-2.5">Tasks</th>
                   <th className="px-3.5 py-2.5">Utilization</th>
                   <th className="px-3.5 py-2.5">Reason</th>
                   <th className="px-3.5 py-2.5">Status</th>
-                  <th className="px-3.5 py-2.5 text-right">Action</th>
+                  <th className="px-3.5 py-2.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border bg-white">
-                {recommendedBlocks.map((b) => (
-                  <tr key={b.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-3.5 py-3 font-mono font-medium text-slate-800 whitespace-nowrap">
-                      {b.date}
-                    </td>
-                    <td className="px-3.5 py-3 font-medium text-slate-900 whitespace-nowrap">
-                      {corridorName(b.corridorId)}
-                    </td>
-                    <td className="px-3.5 py-3 font-mono text-slate-600 whitespace-nowrap">
-                      {b.start}–{b.end}
-                    </td>
-                    <td className="px-3.5 py-3 font-mono text-slate-600 whitespace-nowrap">
-                      {Math.floor(b.durationMin / 60)}h {b.durationMin % 60 ? `${b.durationMin % 60}m` : ''}
-                    </td>
-                    <td className="px-3.5 py-3 font-mono text-slate-700 whitespace-nowrap">
-                      {b.taskIds.length} tasks
-                    </td>
-                    <td className="px-3.5 py-3 whitespace-nowrap">
-                      <span className="inline-flex items-center rounded px-1.5 py-0.5 font-mono text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        83%
-                      </span>
-                    </td>
-                    <td className="px-3.5 py-3 text-slate-600 max-w-[220px] truncate" title={b.section}>
-                      Good maintenance window · {b.taskIds.length} tasks bundled
-                    </td>
-                    <td className="px-3.5 py-3 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
-                        <CheckCircle2 className="size-3" />
-                        Recommended
-                      </span>
-                    </td>
-                    <td className="px-3.5 py-3 text-right whitespace-nowrap">
-                      <Button size="xs" variant="outline" asChild>
-                        <Link href="/planner">Inspect</Link>
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                {recommendedBlocks.map((b) => {
+                  const isApproved = approvedBlockIds[b.id]
+                  return (
+                    <tr key={b.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-3.5 py-3 font-semibold text-slate-900 whitespace-nowrap">
+                        {corridorName(b.corridorId)}
+                      </td>
+                      <td className="px-3.5 py-3 font-mono font-medium text-slate-800 whitespace-nowrap">
+                        {b.date}
+                      </td>
+                      <td className="px-3.5 py-3 font-mono text-slate-600 whitespace-nowrap">
+                        {b.start} – {b.end}
+                      </td>
+                      <td className="px-3.5 py-3 font-mono text-slate-600 whitespace-nowrap">
+                        {Math.floor(b.durationMin / 60)} hours
+                      </td>
+                      <td className="px-3.5 py-3 font-mono text-slate-700 whitespace-nowrap">
+                        {b.taskIds.length} tasks
+                      </td>
+                      <td className="px-3.5 py-3 whitespace-nowrap">
+                        <span className="inline-flex items-center rounded px-2 py-0.5 font-mono text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          83%
+                        </span>
+                      </td>
+                      <td className="px-3.5 py-3 text-slate-600 max-w-[240px]">
+                        <p className="truncate text-slate-700 font-medium">
+                          Same corridor · Tasks fit available window
+                        </p>
+                        <p className="text-[10px] text-slate-400 truncate">
+                          No dependency conflict · High-priority work included
+                        </p>
+                      </td>
+                      <td className="px-3.5 py-3 whitespace-nowrap">
+                        {isApproved ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                            <CheckCircle2 className="size-3 text-emerald-600" />
+                            Approved
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
+                            <Sparkles className="size-3 text-primary" />
+                            Recommended
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-3.5 py-3 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            size="xs"
+                            variant="outline"
+                            onClick={() => setReviewModalBlock(b)}
+                            className="h-7 text-xs gap-1 px-2 text-slate-700 hover:text-slate-900 cursor-pointer"
+                          >
+                            <Eye className="size-3 text-slate-500" />
+                            Review
+                          </Button>
+                          <Button
+                            size="xs"
+                            disabled={isApproved}
+                            onClick={() => handleApproveBlock(b.id, corridorName(b.corridorId), b.date)}
+                            className={cn(
+                              "h-7 text-xs gap-1 px-2.5 font-semibold cursor-pointer",
+                              isApproved
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default"
+                                : "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                          >
+                            <Check className="size-3" />
+                            {isApproved ? 'Approved' : 'Approve'}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -386,6 +451,86 @@ export default function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Review Dialog for Recommended Block */}
+      {reviewModalBlock && (
+        <Dialog open={!!reviewModalBlock} onOpenChange={(open) => !open && setReviewModalBlock(null)}>
+          <DialogContent className="sm:max-w-md bg-white">
+            <DialogHeader>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
+                  {reviewModalBlock.id}
+                </span>
+                <span className="text-xs font-semibold text-slate-500">
+                  {reviewModalBlock.date}
+                </span>
+              </div>
+              <DialogTitle className="text-base font-bold text-slate-900 mt-1">
+                {corridorName(reviewModalBlock.corridorId)}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Window: {reviewModalBlock.start} – {reviewModalBlock.end} ({Math.floor(reviewModalBlock.durationMin / 60)} hours)
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3.5 py-2 text-xs">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Bundled Tasks:</span>
+                  <span className="font-mono font-bold text-slate-900">{reviewModalBlock.taskIds.join(', ')}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Window Utilization:</span>
+                  <span className="font-mono font-bold text-emerald-700">83%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Section:</span>
+                  <span className="font-semibold text-slate-800">{reviewModalBlock.section}</span>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 space-y-1.5">
+                <span className="font-bold text-emerald-900 flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-emerald-600" />
+                  Recommendation Reason
+                </span>
+                <ul className="text-xs text-slate-700 list-disc list-inside space-y-1">
+                  <li>Same corridor alignment minimizes gang movement</li>
+                  <li>Tasks fit into available traffic interval without detention</li>
+                  <li>No dependency conflicts identified</li>
+                  <li>High-priority safety inspection work included</li>
+                </ul>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setReviewModalBlock(null)}
+                className="text-xs"
+              >
+                Close
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  handleApproveBlock(
+                    reviewModalBlock.id,
+                    corridorName(reviewModalBlock.corridorId),
+                    reviewModalBlock.date
+                  )
+                  setReviewModalBlock(null)
+                }}
+                className="text-xs gap-1.5 bg-primary font-semibold"
+              >
+                <Check className="size-3.5" />
+                Approve Block
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

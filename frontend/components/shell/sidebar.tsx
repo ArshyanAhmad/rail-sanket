@@ -42,33 +42,28 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
           )}
         >
           {collapsed ? (
-            <Link
-              href="/"
-              title="Click to go to Public Home Page"
-              className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
+            <div
+              title="Railway Block Planner"
+              className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs"
             >
               <TrainFront className="size-5" />
-            </Link>
+            </div>
           ) : (
-            <Link
-              href="/"
-              title="Click logo to go to Public Home Page"
-              className="flex flex-col justify-center min-w-0 py-0.5 hover:opacity-90 transition-opacity cursor-pointer group"
-            >
-              <div className="relative h-9 w-44 shrink-0">
-                <Image
-                  src="/images/rail-sanket-logo.png"
-                  alt="Rail Sanket"
-                  fill
-                  className="object-contain object-left"
-                  priority
-                />
+            <div className="flex flex-col justify-center min-w-0 py-0.5">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shrink-0 shadow-xs">
+                  <TrainFront className="size-4.5" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-xs font-black tracking-tight text-slate-900 leading-tight uppercase">
+                    RAILWAY BLOCK PLANNER
+                  </h1>
+                  <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase block">
+                    Kharagpur Division
+                  </span>
+                </div>
               </div>
-              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider truncate mt-0.5 group-hover:text-primary transition-colors flex items-center gap-1">
-                <span>Kharagpur Division · SER</span>
-                <span className="text-[9px] text-primary font-bold">← Home</span>
-              </span>
-            </Link>
+            </div>
           )}
         </div>
 
@@ -168,37 +163,42 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
           </Link>
         </div>
 
-        {/* Bottom Officer info & Logout */}
-        <div className="border-t border-sidebar-border p-3 bg-slate-50/50">
+        {/* Bottom Officer info & Logout (Section 10) */}
+        <div className="border-t border-sidebar-border p-3 bg-slate-50/70">
           {!collapsed ? (
-            <div className="flex items-center justify-between gap-2.5">
+            <div className="space-y-2">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Current Officer
+              </div>
               <div className="flex items-center gap-2.5 min-w-0">
                 <Avatar className="size-8 ring-1 ring-border shrink-0">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
                     {user?.initials || 'SM'}
                   </AvatarFallback>
                 </Avatar>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="text-xs font-bold text-slate-900 truncate">
                     {user?.name || 'S. K. Mukherjee'}
                   </div>
                   <div className="text-[10px] font-medium text-slate-500 truncate">
-                    {user?.cadre ? `${user.cadre} · ${user.department.split(' ')[0]}` : 'IRTS · Operating'}
+                    {user?.department || 'Operating Control'}
                   </div>
                 </div>
               </div>
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={logout}
-                title="Sign out"
-                className="flex size-7 items-center justify-center rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors shrink-0 cursor-pointer"
+                className="w-full h-8 text-xs font-semibold text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 gap-1.5 cursor-pointer mt-1"
               >
                 <LogOut className="size-3.5" />
-              </button>
+                <span>Logout</span>
+              </Button>
             </div>
           ) : (
             <button
               onClick={logout}
-              title="Sign out"
+              title="Logout"
               className="flex size-8 mx-auto items-center justify-center rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
             >
               <LogOut className="size-4" />

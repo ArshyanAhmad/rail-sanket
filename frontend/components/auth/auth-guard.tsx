@@ -14,10 +14,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading && !isAuthenticated && !hasRedirected) {
       setHasRedirected(true)
-      const redirectUrl = `/auth?redirect=${encodeURIComponent(pathname)}`
-      router.replace(redirectUrl)
+      router.replace('/auth')
     }
-  }, [isLoading, isAuthenticated, hasRedirected, router, pathname])
+  }, [isLoading, isAuthenticated, hasRedirected, router])
 
   if (isLoading || !isAuthenticated) {
     return (
