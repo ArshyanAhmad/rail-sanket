@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const login = (userData: Partial<UserSession>, redirectTo = '/') => {
+  const login = (userData: Partial<UserSession>, redirectTo = '/dashboard') => {
     const sessionUser: UserSession = {
       id: userData.id || 'usr-custom',
       name: userData.name || 'Officer On-Duty',

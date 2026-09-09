@@ -76,8 +76,8 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
                 <ul className="space-y-0.5">
                   {items.map((item) => {
                     const active =
-                      item.href === '/'
-                        ? pathname === '/'
+                      item.href === '/dashboard'
+                        ? pathname === '/dashboard'
                         : pathname.startsWith(item.href)
                     const link = (
                       <Link

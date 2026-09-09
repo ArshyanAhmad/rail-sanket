@@ -52,7 +52,11 @@ const demoAccounts: DemoAccount[] = [
 function AuthForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTarget = searchParams?.get('redirect') || '/'
+  const rawRedirect = searchParams?.get('redirect')
+  const redirectTarget =
+    !rawRedirect || rawRedirect === '/' || rawRedirect === '/auth'
+      ? '/dashboard'
+      : rawRedirect
   const { user, isAuthenticated, login, logout } = useAuth()
 
   const [selectedDemoKey, setSelectedDemoKey] = useState<string>('Operations Planner')
@@ -76,7 +80,7 @@ function AuthForm() {
     const target = demoAccounts.find((d) => d.roleTitle === selectedDemoKey) || demoAccounts[0]
     setIsProcessing(true)
     setTimeout(() => {
-      login(target.officer, redirectTarget === '/auth' ? '/' : redirectTarget)
+      login(target.officer, redirectTarget)
       setIsProcessing(false)
     }, 250)
   }
@@ -118,7 +122,7 @@ function AuthForm() {
         loginTime: new Date().toLocaleTimeString('en-IN', { hour12: false }),
       }
 
-      login(officerToLogin, redirectTarget === '/auth' ? '/' : redirectTarget)
+      login(officerToLogin, redirectTarget)
       setIsProcessing(false)
     }, 350)
   }
@@ -151,7 +155,7 @@ function AuthForm() {
 
         <div className="flex flex-col gap-2.5">
           <Button asChild className="w-full gap-2">
-            <Link href="/">
+            <Link href="/dashboard">
               Open Dashboard
               <ArrowRight className="size-4" />
             </Link>

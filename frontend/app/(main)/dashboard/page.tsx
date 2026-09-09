@@ -3,28 +3,19 @@ import Image from 'next/image'
 import {
   ArrowRight,
   CalendarClock,
-  TriangleAlert,
   CheckCircle2,
   Clock,
   ShieldCheck,
   AlertTriangle,
   AlertCircle,
-  FileCheck2,
 } from 'lucide-react'
-import { PageHeader } from '@/components/page-header'
-import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AvailabilityChart } from '@/components/charts/availability-chart'
 import { tasks } from '@/lib/data/tasks'
 import { recommendedBlocks } from '@/lib/data/recommendations'
 import { conflicts, exceptions } from '@/lib/data/conflicts'
-import { corridorName, corridorMap } from '@/lib/data/corridors'
-import {
-  confidenceTone,
-  severityTone,
-  impactTone,
-} from '@/lib/status'
+import { corridorName } from '@/lib/data/corridors'
 
 // 6 focused KPI cards requested in Phase 5
 const dashboardKpis = [

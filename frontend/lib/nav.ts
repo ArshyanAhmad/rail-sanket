@@ -21,7 +21,7 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  { label: 'Dashboard', href: '/', icon: LayoutDashboard, section: 'Planning' },
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, section: 'Planning' },
   { label: 'Maintenance Queue', href: '/queue', icon: ListChecks, section: 'Planning' },
   { label: 'Block Planner', href: '/planner', icon: CalendarClock, section: 'Planning' },
   { label: 'Monthly Plan', href: '/monthly', icon: CalendarRange, section: 'Planning' },
@@ -33,7 +33,7 @@ export const navSections: NavItem['section'][] = ['Planning', 'Intelligence']
 
 export function activeNav(pathname: string): NavItem | undefined {
   return (
-    navItems.find((i) => i.href !== '/' && pathname.startsWith(i.href)) ??
+    navItems.find((i) => i.href !== '/dashboard' && pathname.startsWith(i.href)) ??
     navItems.find((i) => i.href === pathname)
   )
 }
